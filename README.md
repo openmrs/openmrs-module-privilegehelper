@@ -1,4 +1,4 @@
-openmrs-module-privilegelog
+openmrs-module-privilegelistener
 ===========================
 
-Allows to log any privilege checks
+Allows to listen to any privilege checks
