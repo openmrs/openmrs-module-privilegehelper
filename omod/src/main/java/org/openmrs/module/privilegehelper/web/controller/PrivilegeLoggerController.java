@@ -13,15 +13,13 @@
  */
 package org.openmrs.module.privilegehelper.web.controller;
 
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.privilegehelper.PrivilegeHelperActivator;
+import org.openmrs.module.privilegehelper.PrivilegeHelperWebConstants;
 import org.openmrs.module.privilegehelper.PrivilegeLogEntry;
 import org.openmrs.module.privilegehelper.PrivilegeLogger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +29,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * The main controller.
+ * The privilege logging controller.
  */
 @Controller
-@RequestMapping(value = PrivilegeLoggerController.MODULE_URL)
+@RequestMapping(value = PrivilegeHelperWebConstants.MODULE_URL + "/logger")
 public class PrivilegeLoggerController {
-	
-	public static final String MODULE_URL = "/module/" + PrivilegeHelperActivator.MODULE_ID;
 	
 	protected final Log log = LogFactory.getLog(getClass());
 	
@@ -63,7 +59,7 @@ public class PrivilegeLoggerController {
 		List<PrivilegeLogEntry> loggedPrivileges = logger.stopLoggingPrivileges(user);
 		
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
-		return MODULE_URL + "/loggedPrivileges";
+		return PrivilegeHelperWebConstants.MODULE_URL + "/logger/loggedPrivileges";
 	}
 	
 	@RequestMapping(value = "/loggedPrivileges", method = RequestMethod.GET)

@@ -7,7 +7,7 @@
 	<li
 		<c:if test='<%= request.getRequestURI().contains("/manage") %>'>class="active"</c:if>>
 		<a
-		href="${pageContext.request.contextPath}/module/privilegehelper/manage.form"><spring:message
+		href="${pageContext.request.contextPath}/module/privilegehelper/logger/manage.form"><spring:message
 				code="privilegehelper.manage" /></a>
 	</li>
 	

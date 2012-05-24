@@ -1,7 +1,9 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
-<%@ include file="/WEB-INF/template/header.jsp"%>
 
-<%@ include file="template/localHeader.jsp"%>
+<openmrs:require privilege="Manage Privileges" otherwise="/login.htm" redirect="/module/privilegehelper/logger/manage.form" />
+
+<%@ include file="/WEB-INF/template/header.jsp"%>
+<%@ include file="../template/localHeader.jsp"%>
 
 <p>This module allows you to log privileges which are checked when
 	the system is used by your users.</p>
