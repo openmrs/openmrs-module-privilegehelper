@@ -13,16 +13,25 @@
 </p>
 
 <p>
-<ol>
+<form action="addToRole.form" method="POST">
+	<input type="hidden" name="userId" value="${user.userId}" />
 	<c:forEach items="${privileges}" var="privilege">
 		<c:set var="color" value="green" />
 		<c:if test="${privilege.missing}">
 			<c:set var="color" value="red" />
 		</c:if>
-		<li style="color: ${color}">${privilege.privilege} <c:if
-				test="${privilege.missing}">(missing)</c:if></li>
+		<input type="checkbox" name="privileges"
+			value="${privilege.privilege}" checked="checked" />
+		<span style="color: ${color}">${privilege.privilege} <c:if
+				test="${privilege.missing}">(missing)</c:if></span>
+		<br />
 	</c:forEach>
-</ol>
+
+	<p>
+		Add selected privileges to a role: <input type="text" name="roleId" />
+		<input type="submit" />
+	</p>
+</form>
 </p>
 
 </p>

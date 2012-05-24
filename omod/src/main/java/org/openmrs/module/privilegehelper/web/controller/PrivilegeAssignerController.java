@@ -17,11 +17,17 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.lang.StringUtils;
+import org.openmrs.Privilege;
+import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.privilegehelper.PrivilegeHelperWebConstants;
 import org.openmrs.module.privilegehelper.PrivilegeLogEntry;
 import org.openmrs.module.privilegehelper.PrivilegeLogger;
+import org.openmrs.web.WebConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -48,6 +54,29 @@ public class PrivilegeAssignerController {
 		
 		model.addAttribute("user", user);
 		model.addAttribute("privileges", privileges);
+	}
+	
+	@RequestMapping(value = "/addToRole", method = RequestMethod.POST)
+	public String addToRole(final Integer userId, final String roleId, final String[] privileges, final ModelMap model,
+	                        final HttpSession session) {
+		model.addAttribute("userId", userId);
+		
+		Role role = Context.getUserService().getRole(roleId);
+		if (role == null) {
+			session.setAttribute(WebConstants.OPENMRS_ERROR_ATTR, "Role " + roleId + " does not exist!");
+			return "redirect:inspect.form";
+		}
+		
+		for (String privilege : privileges) {
+			Privilege privilegeObject = Context.getUserService().getPrivilege(privilege);
+			role.addPrivilege(privilegeObject);
+		}
+		
+		Context.getUserService().saveRole(role);
+		
+		session.setAttribute(WebConstants.OPENMRS_MSG_ATTR, "Privileges " + StringUtils.join(privileges, ", ")
+		        + " added to role " + roleId + ".");
+		return "redirect:inspect.form";
 	}
 	
 	public User getUser(Integer userId) {
