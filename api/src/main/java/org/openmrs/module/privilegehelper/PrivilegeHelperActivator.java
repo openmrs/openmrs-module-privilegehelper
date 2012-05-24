@@ -24,6 +24,8 @@ import org.openmrs.module.ModuleActivator;
 public class PrivilegeHelperActivator implements ModuleActivator {
 	
 	protected Log log = LogFactory.getLog(getClass());
+	
+	public final static String MODULE_ID = "privilegehelper";
 		
 	/**
 	 * @see ModuleActivator#willRefreshContext()
