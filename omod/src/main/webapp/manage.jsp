@@ -17,11 +17,8 @@
 <p>Observed users:
 <ol>
 	<c:forEach items="${loggedUsers}" var="user">
-		<li>${user.personName} - <a
-			href="loggedPrivileges.form?userId=${user.userId}">Show
-				privileges</a> - <a
-			href="stopLoggingPrivileges.form?userId=${user.userId }">Stop
-				logging</a></li>
+		<li><a href="loggedPrivileges.form?userId=${user.userId}">${user.personName}</a>
+		</li>
 	</c:forEach>
 </ol>
 </p>
