@@ -1,6 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
-<openmrs:require privilege="Manage Privileges" otherwise="/login.htm" redirect="/module/privilegehelper/logger/manage.form" />
+<openmrs:require privilege="Manage Privileges" otherwise="/login.htm"
+	redirect="/module/privilegehelper/logger/manage.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="../template/localHeader.jsp"%>
@@ -9,7 +10,7 @@
 	the system is used by your users.</p>
 
 <p>
-<form action="logPrivileges.form" method="POST">
+<form action="log.form" method="POST">
 	Choose a user to observe:
 	<openmrs:fieldGen type="org.openmrs.User" formFieldName="userId" val="" />
 	<input type="submit" />
@@ -19,7 +20,7 @@
 <p>Observed users:
 <ol>
 	<c:forEach items="${loggedUsers}" var="user">
-		<li><a href="loggedPrivileges.form?userId=${user.userId}">${user.personName}</a>
+		<li><a href="logged.form?userId=${user.userId}">${user.personName}</a>
 		</li>
 	</c:forEach>
 </ol>

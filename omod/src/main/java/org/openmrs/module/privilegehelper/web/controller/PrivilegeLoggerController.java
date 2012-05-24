@@ -45,24 +45,24 @@ public class PrivilegeLoggerController {
 		model.addAttribute("loggedUsers", logger.getLoggedUsers());
 	}
 	
-	@RequestMapping(value = "/logPrivileges", method = RequestMethod.POST)
+	@RequestMapping(value = "/log", method = RequestMethod.POST)
 	public String logPrivileges(Integer userId, ModelMap model) {
 		logger.logPrivileges(getUser(userId));
 		
 		model.addAttribute("userId", userId);
-		return "redirect:loggedPrivileges.form";
+		return "redirect:logged.form";
 	}
 	
-	@RequestMapping(value = "/stopLoggingPrivileges", method = RequestMethod.GET)
+	@RequestMapping(value = "/stopLogging", method = RequestMethod.GET)
 	public String stopLoggingPrivileges(Integer userId, ModelMap model) {
 		User user = getUser(userId);
 		List<PrivilegeLogEntry> loggedPrivileges = logger.stopLoggingPrivileges(user);
 		
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
-		return PrivilegeHelperWebConstants.MODULE_URL + "/logger/loggedPrivileges";
+		return PrivilegeHelperWebConstants.MODULE_URL + "/logger/logged";
 	}
 	
-	@RequestMapping(value = "/loggedPrivileges", method = RequestMethod.GET)
+	@RequestMapping(value = "/logged", method = RequestMethod.GET)
 	public void loggedPrivileges(Integer userId, ModelMap model) {
 		User user = getUser(userId);
 		List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(user);
@@ -70,7 +70,7 @@ public class PrivilegeLoggerController {
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
 	}
 	
-	@RequestMapping(value = "/removeLoggedPrivileges", method = RequestMethod.GET)
+	@RequestMapping(value = "/removeLogged", method = RequestMethod.GET)
 	public String removeLoggedPrivileges(Integer userId) {
 		logger.removeLoggedPrivileges(getUser(userId));
 		
