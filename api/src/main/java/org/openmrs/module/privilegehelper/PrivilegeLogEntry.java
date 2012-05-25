@@ -28,10 +28,13 @@ public class PrivilegeLogEntry implements Serializable {
 	
 	private final boolean missing;
 	
-	public PrivilegeLogEntry(Integer userId, String privilege, boolean missing) {
+	private final String whereChecked;
+	
+	public PrivilegeLogEntry(Integer userId, String privilege, boolean missing, String whereChecked) {
 		this.userId = userId;
 		this.privilege = privilege;
 		this.missing = missing;
+		this.whereChecked = whereChecked;
 	}
 	
 	/**
@@ -65,6 +68,13 @@ public class PrivilegeLogEntry implements Serializable {
 	}
 	
 	/**
+	 * @return the whereChecked
+	 */
+	public String getWhereChecked() {
+		return whereChecked;
+	}
+	
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -74,6 +84,7 @@ public class PrivilegeLogEntry implements Serializable {
 		result = prime * result + (missing ? 1231 : 1237);
 		result = prime * result + ((privilege == null) ? 0 : privilege.hashCode());
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		result = prime * result + ((whereChecked == null) ? 0 : whereChecked.hashCode());
 		return result;
 	}
 	
@@ -101,6 +112,12 @@ public class PrivilegeLogEntry implements Serializable {
 				return false;
 		} else if (!userId.equals(other.userId))
 			return false;
+		if (whereChecked == null) {
+			if (other.whereChecked != null)
+				return false;
+		} else if (!whereChecked.equals(other.whereChecked))
+			return false;
 		return true;
 	}
+	
 }

@@ -27,8 +27,8 @@
 		<c:if test="${privilege.missing}">
 			<c:set var="color" value="red" />
 		</c:if>
-		<li style="color: ${color}">${privilege.privilege} <c:if
-				test="${privilege.missing}">(missing)</c:if></li>
+		<li><span style="color: ${color}">${privilege.privilege} <c:if
+				test="${privilege.missing}">(missing)</c:if></span>in ${privilege.whereChecked}</li>
 	</c:forEach>
 </ol>
 </p>
