@@ -8,29 +8,38 @@
 
 <p>
 	<c:choose>
-		<c:when test="${loggingPrivileges}">Logging privilege checks for ${user.personName}... 
-<a href="logged.form?userId=${user.userId}">Refresh</a>
-			<a href="stopLogging.form?userId=${user.userId}">Stop logging</a>
+		<c:when test="${loggingPrivileges}">
+			<img src="${pageContext.request.contextPath}/images/loading.gif"
+				alt="Loading..." />
+		Logging privilege checks for ${user.personName}... 
+<input type="button" value="Refresh"
+				onclick="window.location='logged.form?userId=${user.userId}'" />
+			<input type="button" value="Stop logging"
+				onclick="window.location='stopLogging.form?userId=${user.userId}'" />
+			<input type="button" value="Assign privileges"
+				onclick="window.location='../assigner/assign.form?userId=${user.userId}'" />
 		</c:when>
 		<c:otherwise>
-		Logged privilege checks for ${user.personName}.
-			<a href="../assigner/inspect.form?userId=${user.userId}">Inspect</a>
-			<a href="removeLogged.form?userId=${user.userId}">Remove logs</a>
+		Privilege checks logged for ${user.personName}: 
+			<input type="button" value="Assign privileges"
+				onclick="window.location='../assigner/assign.form?userId=${user.userId}'" />
+			<input type="button" value="Remove logs"
+				onclick="window.location='removeLogged.form?userId=${user.userId}'" />
 		</c:otherwise>
 	</c:choose>
 </p>
 
 <p>
-<ol>
 	<c:forEach items="${loggedPrivileges}" var="privilege">
 		<c:set var="color" value="green" />
 		<c:if test="${privilege.missing}">
 			<c:set var="color" value="red" />
 		</c:if>
-		<li><span style="color: ${color}">${privilege.privilege} <c:if
-				test="${privilege.missing}">(missing)</c:if></span>in ${privilege.whereChecked}</li>
+		<openmrs:formatDate date="${privilege.date}" format="MMM d HH:mm:ss:S" />
+		<span style="color: ${color}">${privilege.privilege} <c:if
+				test="${privilege.missing}">(missing)</c:if></span>in
+			${privilege.whereChecked}<br />
 	</c:forEach>
-</ol>
 </p>
 
 </p>

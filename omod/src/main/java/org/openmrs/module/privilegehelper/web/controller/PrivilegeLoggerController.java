@@ -25,8 +25,11 @@ import org.openmrs.module.privilegehelper.PrivilegeLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * The privilege logging controller.
@@ -40,22 +43,36 @@ public class PrivilegeLoggerController {
 	@Autowired
 	PrivilegeLogger logger;
 	
-	@RequestMapping(value = "/manage", method = RequestMethod.GET)
-	public void manage(ModelMap model) {
+	@RequestMapping(value = "/log", method = RequestMethod.GET)
+	public void log(ModelMap model) {
 		model.addAttribute("loggedUsers", logger.getLoggedUsers());
 	}
 	
+	@ModelAttribute
+	public User getUser(@RequestParam(required = false) Integer userId) {
+		if (userId == null) {
+			return new User();
+		} else {
+			User user = Context.getUserService().getUser(userId);
+			return (user != null) ? user : new User();
+		}
+	}
+	
 	@RequestMapping(value = "/log", method = RequestMethod.POST)
-	public String logPrivileges(Integer userId, ModelMap model) {
-		logger.logPrivileges(getUser(userId));
+	public String logPrivileges(User user, Errors errors, ModelMap model) {
+		if (user.getUserId() == null) {
+			errors.rejectValue("userId", "privilegehelper.user.invalid", "You must enter a valid user");
+			return null;
+		}
 		
-		model.addAttribute("userId", userId);
+		logger.logPrivileges(user);
+		
+		model.addAttribute("userId", user.getUserId());
 		return "redirect:logged.form";
 	}
 	
 	@RequestMapping(value = "/stopLogging", method = RequestMethod.GET)
-	public String stopLoggingPrivileges(Integer userId, ModelMap model) {
-		User user = getUser(userId);
+	public String stopLoggingPrivileges(User user, ModelMap model) {
 		List<PrivilegeLogEntry> loggedPrivileges = logger.stopLoggingPrivileges(user);
 		
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
@@ -63,18 +80,17 @@ public class PrivilegeLoggerController {
 	}
 	
 	@RequestMapping(value = "/logged", method = RequestMethod.GET)
-	public void loggedPrivileges(Integer userId, ModelMap model) {
-		User user = getUser(userId);
+	public void loggedPrivileges(User user, ModelMap model) {
 		List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(user);
 		
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
 	}
 	
 	@RequestMapping(value = "/removeLogged", method = RequestMethod.GET)
-	public String removeLoggedPrivileges(Integer userId) {
-		logger.removeLoggedPrivileges(getUser(userId));
+	public String removeLoggedPrivileges(User user) {
+		logger.removeLoggedPrivileges(user);
 		
-		return "redirect:manage.form";
+		return "redirect:log.form";
 	}
 	
 	public void populateModelForLoggedPrivileges(User user, List<PrivilegeLogEntry> loggedPrivileges, ModelMap model) {
@@ -83,7 +99,4 @@ public class PrivilegeLoggerController {
 		model.addAttribute("loggingPrivileges", logger.isLoggingPrivileges(user));
 	}
 	
-	public User getUser(Integer userId) {
-		return Context.getUserService().getUser(userId);
-	}
 }

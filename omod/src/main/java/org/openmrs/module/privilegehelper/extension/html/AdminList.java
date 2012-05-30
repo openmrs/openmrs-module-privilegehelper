@@ -21,7 +21,7 @@ import org.openmrs.module.web.extension.AdministrationSectionExt;
 
 /**
  * This class defines the links that will appear on the administration page under the
- * "privilegehelper.title" heading. 
+ * "privilegehelper.title" heading.
  */
 public class AdminList extends AdministrationSectionExt {
 	
@@ -44,7 +44,8 @@ public class AdminList extends AdministrationSectionExt {
 	 */
 	public Map<String, String> getLinks() {
 		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("/module/privilegehelper/logger/manage.form", "privilegehelper.manage");
+		map.put("/module/privilegehelper/logger/log.form", "privilegehelper.log");
+		map.put("/module/privilegehelper/assigner/assign.form", "privilegehelper.assign");
 		return map;
 	}
 	

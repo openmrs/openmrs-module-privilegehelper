@@ -14,6 +14,7 @@
 package org.openmrs.module.privilegehelper;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Represents a single log entry.
@@ -26,15 +27,21 @@ public class PrivilegeLogEntry implements Serializable {
 	
 	private final String privilege;
 	
+	private final boolean required;
+	
 	private final boolean missing;
 	
 	private final String whereChecked;
 	
-	public PrivilegeLogEntry(Integer userId, String privilege, boolean missing, String whereChecked) {
+	private final Date date;
+	
+	public PrivilegeLogEntry(Integer userId, String privilege, boolean required, boolean missing, String whereChecked) {
 		this.userId = userId;
 		this.privilege = privilege;
+		this.required = required;
 		this.missing = missing;
 		this.whereChecked = whereChecked;
+		this.date = new Date();
 	}
 	
 	/**
@@ -52,18 +59,16 @@ public class PrivilegeLogEntry implements Serializable {
 	}
 	
 	/**
-	 * @return the missing
+	 * @return the required
 	 */
-	public boolean isMissing() {
-		return missing;
+	public boolean isRequired() {
+		return required;
 	}
 	
 	/**
-	 * Provided for JSTL use only.
-	 * 
 	 * @return the missing
 	 */
-	public Boolean getIsMissing() {
+	public boolean isMissing() {
 		return missing;
 	}
 	
@@ -75,14 +80,23 @@ public class PrivilegeLogEntry implements Serializable {
 	}
 	
 	/**
+	 * @return the date
+	 */
+	public Date getDate() {
+		return date;
+	}
+	
+	/**
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((date == null) ? 0 : date.hashCode());
 		result = prime * result + (missing ? 1231 : 1237);
 		result = prime * result + ((privilege == null) ? 0 : privilege.hashCode());
+		result = prime * result + (required ? 1231 : 1237);
 		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
 		result = prime * result + ((whereChecked == null) ? 0 : whereChecked.hashCode());
 		return result;
@@ -100,12 +114,19 @@ public class PrivilegeLogEntry implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		PrivilegeLogEntry other = (PrivilegeLogEntry) obj;
+		if (date == null) {
+			if (other.date != null)
+				return false;
+		} else if (!date.equals(other.date))
+			return false;
 		if (missing != other.missing)
 			return false;
 		if (privilege == null) {
 			if (other.privilege != null)
 				return false;
 		} else if (!privilege.equals(other.privilege))
+			return false;
+		if (required != other.required)
 			return false;
 		if (userId == null) {
 			if (other.userId != null)

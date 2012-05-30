@@ -6,21 +6,23 @@
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="../template/localHeader.jsp"%>
 
-<p>This module allows you to log privileges which are checked when
-	the system is used by your users.</p>
+<p>This page allows you to log privileges which are checked when the
+	system is used by users.</p>
 
 <p>
-<form action="log.form" method="POST">
-	Choose a user to observe:
+	<form:form modelAttribute="user">
+	Enter user:
 	<openmrs:fieldGen type="org.openmrs.User" formFieldName="userId" val="" />
-	<input type="submit" />
-</form>
+		<form:errors path="userId" cssClass="error" />
+		<input type="submit" value="Start logging" />
+	</form:form>
 </p>
 
-<p>Observed users:
 <ol>
 	<c:forEach items="${loggedUsers}" var="user">
-		<li><a href="logged.form?userId=${user.userId}">${user.personName}</a>
+		<li>${user.personName} <input type="button"
+			onclick="window.location='logged.form?userId=${user.userId}'"
+			value="View logs" />
 		</li>
 	</c:forEach>
 </ol>

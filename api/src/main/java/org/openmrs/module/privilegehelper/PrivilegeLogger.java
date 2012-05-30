@@ -101,7 +101,7 @@ public class PrivilegeLogger implements PrivilegeListener {
 		
 		final String where = findWhereChecked();
 		
-		log.getPrivileges().add(new PrivilegeLogEntry(user.getUserId(), privilege, !hasPrivilege, where));
+		log.getPrivileges().add(new PrivilegeLogEntry(user.getUserId(), privilege, true, !hasPrivilege, where));
 	}
 	
 	/**
