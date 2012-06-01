@@ -6,26 +6,34 @@
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="../template/localHeader.jsp"%>
 
-<p>This page allows you to log privileges which are checked when the
-	system is used by users.</p>
+<p>This tool helps you figure out what privileges are required to
+	perform a particular task, and then helps you assign those privileges
+	to roles.</p>
 
-<p>
-	<form:form modelAttribute="user">
-	Enter user:
-	<openmrs:fieldGen type="org.openmrs.User" formFieldName="userId" val="" />
+<form:form modelAttribute="user">
+	<p>
+		1. Choose a user that you will use to perform the task:
+		<openmrs:fieldGen type="org.openmrs.User" formFieldName="userId"
+			val="${currentUser}" />
 		<form:errors path="userId" cssClass="error" />
-		<input type="submit" value="Start logging" />
-	</form:form>
-</p>
+	</p>	
+	<p>2. In another tab/window/browser, have that user open the first
+		page of their task.</p>
+	<p>
+		3. <input type="submit" value="Start logging" />
+	</p>
+</form:form>
 
-<ol>
-	<c:forEach items="${loggedUsers}" var="user">
-		<li>${user.personName} <input type="button"
-			onclick="window.location='logged.form?userId=${user.userId}'"
-			value="View logs" />
-		</li>
-	</c:forEach>
-</ol>
-</p>
+<c:if test="${!empty loggedUsers}">
+	<h3>Previously logged users:</h3>
+	<ol>
+		<c:forEach items="${loggedUsers}" var="user">
+			<li>${user.personName} <input type="button"
+				onclick="window.location='logged.form?userId=${user.userId}'"
+				value="View logs" />
+			</li>
+		</c:forEach>
+	</ol>
+</c:if>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

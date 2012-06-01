@@ -17,7 +17,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,16 +43,8 @@ public class PrivilegeLogger implements PrivilegeListener {
 	
 	private final Map<Integer, PrivilegeLog> logByUserId;
 	
-	private final Set<String> ignoredClasses;
-	
 	public PrivilegeLogger() {
 		logByUserId = new ConcurrentHashMap<Integer, PrivilegeLog>();
-		ignoredClasses = new HashSet<String>();
-		
-		ignoredClasses.add(AuthorizationAdvice.class.getName());
-		ignoredClasses.add(Context.class.getName());
-		ignoredClasses.add(RequireTag.class.getName());
-		ignoredClasses.add(PrivilegeTag.class.getName());
 	}
 	
 	private class PrivilegeLog {
@@ -99,9 +90,24 @@ public class PrivilegeLogger implements PrivilegeListener {
 		if (log == null || !log.isActive())
 			return;
 		
-		final String where = findWhereChecked();
+		final StackTraceInfo stackTraceInfo = inspectStackTrace();
 		
-		log.getPrivileges().add(new PrivilegeLogEntry(user.getUserId(), privilege, true, !hasPrivilege, where));
+		log.getPrivileges()
+		        .add(
+		            new PrivilegeLogEntry(user.getUserId(), privilege, stackTraceInfo.required, !hasPrivilege,
+		                    stackTraceInfo.where));
+	}
+	
+	private class StackTraceInfo {
+		
+		public final String where;
+		
+		public final boolean required;
+		
+		public StackTraceInfo(final String where, final boolean required) {
+			this.where = where;
+			this.required = required;
+		}
 	}
 	
 	/**
@@ -109,8 +115,9 @@ public class PrivilegeLogger implements PrivilegeListener {
 	 * 
 	 * @return the class.method or <code>null</code> if it cannot be found
 	 */
-	private String findWhereChecked() {
+	private StackTraceInfo inspectStackTrace() {
 		final StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+		boolean requiredPrivilege = false;
 		for (int i = 0; i < stackTrace.length; i++) {
 			final StackTraceElement unrelatedElement = stackTrace[i];
 			
@@ -128,14 +135,31 @@ public class PrivilegeLogger implements PrivilegeListener {
 						}
 						jsp = jsp.replace(".", "/");
 						jsp = jsp.replace("_", ".");
-						return jsp;
+						
+						return new StackTraceInfo(jsp, requiredPrivilege);
 					}
 					
 					if (!element.getClassName().startsWith("org.openmrs")) {
 						continue;
 					}
 					
-					if (ignoredClasses.contains(element.getClassName())) {
+					//Determine if it is a required privilege or a simple check
+					if (RequireTag.class.getName().equals(element.getClassName())) {
+						requiredPrivilege = true;
+						continue;
+					}
+					if (PrivilegeTag.class.getName().equals(element.getClassName())) {
+						requiredPrivilege = false;
+						continue;
+					}
+					if (AuthorizationAdvice.class.getName().equals(element.getClassName())) {
+						requiredPrivilege = true;
+						continue;
+					}
+					if (Context.class.getName().equals(element.getClassName())) {
+						if ("requirePrivilege".equals(element.getMethodName())) {
+							requiredPrivilege = true;
+						}
 						continue;
 					}
 					
@@ -162,15 +186,15 @@ public class PrivilegeLogger implements PrivilegeListener {
 							}
 							
 							if (url.isEmpty()) {
-								return element.toString();
+								return new StackTraceInfo(element.toString(), requiredPrivilege);
 							} else {
-								return element.toString() + ", URL: " + url;
+								return new StackTraceInfo(element.toString() + ", URL: " + url, requiredPrivilege);
 							}
 						}
 					}
 					catch (ClassNotFoundException e) {}
 					
-					return element.toString();
+					return new StackTraceInfo(element.toString(), requiredPrivilege);
 				}
 			}
 		}

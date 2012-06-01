@@ -45,6 +45,7 @@ public class PrivilegeLoggerController {
 	
 	@RequestMapping(value = "/log", method = RequestMethod.GET)
 	public void log(ModelMap model) {
+		model.addAttribute("currentUser", Context.getAuthenticatedUser());
 		model.addAttribute("loggedUsers", logger.getLoggedUsers());
 	}
 	
