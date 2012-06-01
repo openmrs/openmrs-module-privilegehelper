@@ -15,11 +15,10 @@ package org.openmrs.module.privilegehelper.web.controller;
 
 import java.util.Comparator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,9 +31,9 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.privilegehelper.PrivilegeHelperWebConstants;
 import org.openmrs.module.privilegehelper.PrivilegeLogEntry;
 import org.openmrs.module.privilegehelper.PrivilegeLogger;
+import org.openmrs.validator.RoleValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -47,46 +46,44 @@ import org.springframework.web.bind.annotation.SessionAttributes;
  * The privilege assigning controller.
  */
 @Controller
-@SessionAttributes(PrivilegeAssignerController.PRIVILEGES)
+@SessionAttributes(value = { PrivilegeAssignerController.PRIVILEGES, PrivilegeAssignerController.MISSING_PRIVILEGES })
 @RequestMapping(value = PrivilegeHelperWebConstants.MODULE_URL + "/assigner")
 public class PrivilegeAssignerController {
 	
 	public static final String PRIVILEGES = "privileges";
 	
+	public static final String MISSING_PRIVILEGES = "missingPrivileges";
+	
 	@Autowired
 	PrivilegeLogger logger;
 	
 	@ModelAttribute(PRIVILEGES)
-	public Set<String> getPrivileges() {
-		return new LinkedHashSet<String>();
+	public SortedSet<PrivilegeLogEntry> getPrivileges() {
+		return new TreeSet<PrivilegeLogEntry>();
+	}
+	
+	@ModelAttribute(MISSING_PRIVILEGES)
+	public SortedSet<PrivilegeLogEntry> getMissingPrivileges() {
+		return new TreeSet<PrivilegeLogEntry>();
 	}
 	
 	@ModelAttribute
-	public Role getRole(@RequestParam(required = false) String name) {
-		if (name == null) {
-			return new Role();
-		} else {
-			Role role = Context.getUserService().getRole(name);
-			return (role != null) ? role : new Role();
-		}
+	public Role getRole() {
+		return new Role();
 	}
 	
 	@ModelAttribute
-	public Privilege getPrivilege(@RequestParam(required = false) String name) {
+	public Privilege getPrivilege(final @RequestParam(required = false) String name) {
 		if (name == null) {
 			return new Privilege();
 		} else {
-			Privilege privilege = Context.getUserService().getPrivilege(name);
-			if (privilege == null) {
-				return new Privilege();
-			} else {
-				return privilege;
-			}
+			final Privilege privilege = Context.getUserService().getPrivilege(name);
+			return (privilege != null) ? privilege : new Privilege();
 		}
 	}
 	
 	@ModelAttribute
-	public User getUser(@RequestParam(required = false) Integer userId) {
+	public User getUser(final @RequestParam(required = false) Integer userId) {
 		if (userId == null) {
 			return new User();
 		} else {
@@ -95,72 +92,62 @@ public class PrivilegeAssignerController {
 		}
 	}
 	
-	@RequestMapping(value = "/assign")
-	public void assign(@ModelAttribute(PRIVILEGES) Set<String> privileges, User user, Model model) {
-		if (user.getUserId() != null) {
-			Set<String> missingPrivileges = new LinkedHashSet<String>();
-			
-			List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(user);
-			for (PrivilegeLogEntry privilege : loggedPrivileges) {
-				if (StringUtils.isBlank(privilege.getPrivilege())) {
-					continue;
-				}
-				
-				Privilege existingPrivilege = Context.getUserService().getPrivilege(privilege.getPrivilege());
-				
-				if (existingPrivilege != null) {
-					privileges.add(existingPrivilege.getName());
-				} else {
-					missingPrivileges.add(privilege.getPrivilege());
-				}
+	@RequestMapping(value = "/assignPrivileges")
+	public String assignPrivileges(final @ModelAttribute(PRIVILEGES) SortedSet<PrivilegeLogEntry> privileges,
+	                               final @ModelAttribute(MISSING_PRIVILEGES) SortedSet<PrivilegeLogEntry> missingPrivileges,
+	                               final User user, @RequestParam final Integer loggedUserId, final ModelMap model) {
+		User loggedUser = Context.getUserService().getUser(loggedUserId);
+		if (loggedUser == null) {
+			throw new IllegalArgumentException("User with id " + loggedUserId + " does not exist!");
+		}
+		
+		final List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(loggedUser);
+		
+		for (PrivilegeLogEntry privilege : loggedPrivileges) {
+			if (StringUtils.isBlank(privilege.getPrivilege())) {
+				continue;
 			}
 			
-			model.addAttribute("missingPrivileges", missingPrivileges);
-		}
-	}
-	
-	@RequestMapping(value = "/addPrivilege", method = RequestMethod.POST)
-	public String addPrivilege(Privilege privilege, Errors errors, @ModelAttribute(PRIVILEGES) Set<String> privileges,
-	                           ModelMap model) {
-		if (privilege.getName() == null) {
-			errors.rejectValue("name", "privilegehelper.privilege.invalid", "You must enter a valid privilege");
-			return PrivilegeHelperWebConstants.MODULE_URL + "/assigner/assign";
-		}
-		
-		privileges.add(privilege.getName());
-		
-		model.clear();
-		return "redirect:assign.form";
-	}
-	
-	@RequestMapping(value = "/removePrivilege", method = RequestMethod.POST)
-	public String removePrivilege(Privilege privilege, @ModelAttribute(PRIVILEGES) Set<String> privileges, ModelMap model) {
-		if (privilege.getName() != null) {
-			privileges.remove(privilege.getName());
-		}
-		
-		model.clear();
-		return "redirect:assign.form";
-	}
-	
-	@RequestMapping(value = "/assignUser", method = RequestMethod.GET)
-	public void assignUser() {
-	}
-	
-	@RequestMapping(value = "/assignUser", method = RequestMethod.POST)
-	public String assignUser(User user, Errors errors, ModelMap model) {
-		if (user.getUserId() == null) {
-			errors.rejectValue("userId", "privilegehelper.user.invalid", "You must enter a valid user");
-			return null;
+			final Privilege existingPrivilege = Context.getUserService().getPrivilege(privilege.getPrivilege());
+			
+			if (existingPrivilege != null) {
+				privileges.add(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(),
+				        !user.hasPrivilege(privilege.getPrivilege())));
+			} else {
+				missingPrivileges.add(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege
+				        .isRequired(), !user.hasPrivilege(privilege.getPrivilege())));
+			}
 		}
 		
 		model.addAttribute("userId", user.getUserId());
 		return "redirect:assignRoles.form";
 	}
 	
+	@RequestMapping(value = "/assignUser", method = RequestMethod.GET)
+	public void assignUser(@RequestParam(required = false) final Integer loggedUserId, final ModelMap model) {
+		model.addAttribute("loggedUserId", loggedUserId);
+	}
+	
+	@RequestMapping(value = "/assignUser", method = RequestMethod.POST)
+	public String assignUser(@RequestParam(required = false) final Integer loggedUserId, final User user,
+	                         final Errors errors, final ModelMap model) {
+		if (user.getUserId() == null) {
+			errors.rejectValue("userId", "privilegehelper.user.invalid", "You must enter a valid user");
+			return null;
+		}
+		
+		model.addAttribute("userId", user.getUserId());
+		if (loggedUserId != null) {
+			model.addAttribute("loggedUserId", loggedUserId);
+		}
+		return "redirect:assignPrivileges.form";
+	}
+	
 	@RequestMapping(value = "/assignRoles", method = RequestMethod.GET)
-	public void assignRoles(@ModelAttribute(PRIVILEGES) Set<String> privileges, User user, ModelMap model) {
-		Map<String, Boolean[]> rolesByPrivileges = new LinkedHashMap<String, Boolean[]>();
+	public void assignRoles(@ModelAttribute(PRIVILEGES) final SortedSet<PrivilegeLogEntry> privileges,
+	                        @ModelAttribute(MISSING_PRIVILEGES) final SortedSet<PrivilegeLogEntry> missingPrivileges,
+	                        final User user, final ModelMap model) {
+		Map<PrivilegeLogEntry, Boolean[]> rolesByPrivileges = new TreeMap<PrivilegeLogEntry, Boolean[]>();
 		
 		SortedSet<Role> userRoles = new TreeSet<Role>(new Comparator<Role>() {
 			
@@ -169,22 +156,21 @@ public class PrivilegeAssignerController {
 				return o1.getName().compareTo(o2.getName());
 			}
 		});
-		
 		userRoles.addAll(user.getAllRoles());
 		
-		for (String privilege : privileges) {
-			Boolean[] roles = new Boolean[userRoles.size() + 1];
-			roles[0] = user.hasPrivilege(privilege);
+		for (PrivilegeLogEntry privilege : privileges) {
+			Boolean[] roles = new Boolean[userRoles.size()];
 			
-			int i = 1;
+			int i = 0;
 			for (Role role : userRoles) {
-				roles[i++] = role.hasPrivilege(privilege);
+				roles[i++] = !role.hasPrivilege(privilege.getPrivilege());
 			}
 			
-			rolesByPrivileges.put(privilege, roles);
+			rolesByPrivileges.put(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(),
+			        !user.hasPrivilege(privilege.getPrivilege())), roles);
 		}
 		
-		Set<String> roles = new LinkedHashSet<String>();
+		SortedSet<String> roles = new TreeSet<String>();
 		for (Role role : userRoles) {
 			roles.add(role.getName());
 		}
@@ -195,18 +181,37 @@ public class PrivilegeAssignerController {
 	}
 	
 	@RequestMapping(value = "/assignRoles", method = RequestMethod.POST)
-	public void assignRolesPOST(@ModelAttribute(PRIVILEGES) Set<String> privileges, User user, HttpServletRequest request,
-	                            Role role, @RequestParam(required = false) Boolean assignRole, ModelMap model) {
+	public void assignRolesPOST(@ModelAttribute(PRIVILEGES) final SortedSet<PrivilegeLogEntry> privileges,
+	                            @ModelAttribute(MISSING_PRIVILEGES) final SortedSet<PrivilegeLogEntry> missingPrivileges,
+	                            final User user, final HttpServletRequest request, final Role role, final Errors errors,
+	                            @RequestParam(required = false) final String assignRole, final ModelMap model) {
 		if (assignRole != null) {
-			if (role.getName() != null) {
-				user.addRole(role);
+			final RoleValidator validator = new RoleValidator();
+			validator.validate(role, errors);
+			if (errors.hasErrors()) {
+				assignRoles(privileges, missingPrivileges, user, model);
+				return;
 			}
+			
+			Role existingRole = Context.getUserService().getRole(role.getRole());
+			if (existingRole != null) {
+				errors.rejectValue("role", "role.exists.error", "Role with the given name already exists!");
+				assignRoles(privileges, missingPrivileges, user, model);
+				return;
+			}
+			
+			Context.getUserService().saveRole(role);
+			user.addRole(role);
 		} else {
-			for (String privilege : privileges) {
-				String[] roles = request.getParameterValues(privilege);
+			for (PrivilegeLogEntry privilege : privileges) {
+				String[] roles = request.getParameterValues(privilege.getPrivilege());
+				
+				if (roles == null) {
+					continue;
+				}
 				
 				for (String existingRole : roles) {
-					Privilege privilegeObject = Context.getUserService().getPrivilege(privilege);
+					Privilege privilegeObject = Context.getUserService().getPrivilege(privilege.getPrivilege());
 					
 					Role roleObject = Context.getUserService().getRole(existingRole);
 					roleObject.addPrivilege(privilegeObject);
@@ -216,7 +221,6 @@ public class PrivilegeAssignerController {
 			}
 		}
 		
-		model.clear();
-		assignRoles(privileges, user, model);
+		assignRoles(privileges, missingPrivileges, user, model);
 	}
 }

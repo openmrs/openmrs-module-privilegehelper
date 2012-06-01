@@ -11,13 +11,6 @@
 				code="privilegehelper.log" /></a>
 	</li>
 
-	<li
-		<c:if test='<%=request.getRequestURI().contains("/assigner")%>'>class="active"</c:if>>
-		<a
-		href="${pageContext.request.contextPath}/module/privilegehelper/assigner/assign.form"><spring:message
-				code="privilegehelper.assign" /></a>
-	</li>
-
 	<!-- Add further links here -->
 </ul>
 <h2>

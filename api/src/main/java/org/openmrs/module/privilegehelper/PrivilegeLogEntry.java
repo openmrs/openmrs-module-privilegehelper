@@ -14,12 +14,15 @@
 package org.openmrs.module.privilegehelper;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Date;
+
+import org.apache.commons.collections.comparators.ComparatorChain;
 
 /**
  * Represents a single log entry.
  */
-public class PrivilegeLogEntry implements Serializable {
+public class PrivilegeLogEntry implements Serializable, Comparable<PrivilegeLogEntry> {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -42,6 +45,15 @@ public class PrivilegeLogEntry implements Serializable {
 		this.missing = missing;
 		this.whereChecked = whereChecked;
 		this.date = new Date();
+	}
+	
+	public PrivilegeLogEntry(Integer userId, String privilege, boolean required, boolean missing) {
+		this.userId = userId;
+		this.privilege = privilege;
+		this.required = required;
+		this.missing = missing;
+		this.whereChecked = null;
+		this.date = null;
 	}
 	
 	/**
@@ -139,6 +151,51 @@ public class PrivilegeLogEntry implements Serializable {
 		} else if (!whereChecked.equals(other.whereChecked))
 			return false;
 		return true;
+	}
+	
+	/**
+	 * @see java.lang.Comparable#compareTo(java.lang.Object)
+	 */
+	@Override
+	public int compareTo(PrivilegeLogEntry o) {
+		ComparatorChain chain = new ComparatorChain();
+		chain.addComparator(new Comparator<PrivilegeLogEntry>() {
+			
+			@Override
+			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
+				if (o1.required && o2.required) {
+					return 0;
+				} else if (o1.required) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		});
+		
+		chain.addComparator(new Comparator<PrivilegeLogEntry>() {
+			
+			@Override
+			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
+				if (o1.missing && o2.missing) {
+					return 0;
+				} else if (o1.missing) {
+					return 1;
+				} else {
+					return -1;
+				}
+			}
+		});
+		
+		chain.addComparator(new Comparator<PrivilegeLogEntry>() {
+			
+			@Override
+			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
+				return o1.getPrivilege().compareTo(o2.getPrivilege());
+			}
+		});
+		
+		return chain.compare(o, this);
 	}
 	
 }

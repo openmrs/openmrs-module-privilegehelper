@@ -1,7 +1,7 @@
 <%@ include file="/WEB-INF/template/include.jsp"%>
 
 <openmrs:require privilege="Manage Privileges" otherwise="/login.htm"
-	redirect="/module/privilegehelper/logger/manage.form" />
+	redirect="/module/privilegehelper/logger/log.form" />
 
 <%@ include file="/WEB-INF/template/header.jsp"%>
 <%@ include file="../template/localHeader.jsp"%>
@@ -24,7 +24,7 @@
 	<c:otherwise>
 		<p>
 			<input type="button" value="Assign privileges"
-				onclick="window.location='../assigner/assign.form?userId=${user.userId}'" />
+				onclick="window.location='../assigner/assignUser.form?loggedUserId=${user.userId}'" />
 			or <input type="button" value="Remove logs"
 				onclick="window.location='removeLogged.form?userId=${user.userId}'" />
 		</p>
