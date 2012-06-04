@@ -33,10 +33,10 @@ Privilege checks logged for ${user.personName}:
 </c:choose>
 
 <p>
-	Legend: <span style="color: green">required to perform action -
-		already assigned</span>, <span style="color: red">required to perform
-		action - missing</span>, <span style="color: grey">enables optional
-		feature - already assigned</span>, <span style="color: orange">enables
+	Legend: <span style="color: green">* required to perform action -
+		already assigned</span>, <span style="color: red">! required to perform
+		action - missing</span>, <span style="color: grey">+ enables optional
+		feature - already assigned</span>, <span style="color: orange">? enables
 		optional feature - missing</span>
 </p>
 <p>
@@ -44,20 +44,24 @@ Privilege checks logged for ${user.personName}:
 		<c:choose>
 			<c:when test="${privilege.required and privilege.missing}">
 				<c:set var="color" value="red" />
+				<c:set var="symbol" value="!" />
 			</c:when>
 			<c:when test="${privilege.required and !privilege.missing }">
 				<c:set var="color" value="green" />
+				<c:set var="symbol" value="*" />
 			</c:when>
 			<c:when test="${!privilege.required and privilege.missing}">
 				<c:set var="color" value="orange" />
+				<c:set var="symbol" value="?" />
 			</c:when>
 			<c:when test="${!privilege.required and !privilege.missing}">
 				<c:set var="color" value="grey" />
+				<c:set var="symbol" value="+" />
 			</c:when>
 		</c:choose>
 
 		<openmrs:formatDate date="${privilege.date}" format="MMM d HH:mm:ss:S" />
-		<span style="color: ${color};">${privilege.privilege} </span>
+		<span style="color: ${color};">${symbol} ${privilege.privilege} </span>
 		<span style="font-size: xx-small;">in ${privilege.whereChecked}</span>
 		<br />
 	</c:forEach>

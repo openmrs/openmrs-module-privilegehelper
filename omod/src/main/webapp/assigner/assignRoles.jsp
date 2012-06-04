@@ -12,10 +12,10 @@
 <form action="assignRoles.form" method="POST">
 	<p>Assigning privileges to roles for ${user.personName}</p>
 	<p>
-		Legend: <span style="color: green">required to perform action -
-			already assigned</span>, <span style="color: red">required to perform
-			action - missing</span>, <span style="color: grey">enables optional
-			feature - already assigned</span>, <span style="color: orange">enables
+		Legend: <span style="color: green">* required to perform action -
+			already assigned</span>, <span style="color: red">! required to perform
+			action - missing</span>, <span style="color: grey">+ enables optional
+			feature - already assigned</span>, <span style="color: orange">? enables
 			optional feature - missing</span>
 	</p>
 	<input type="hidden" name="userId" value="${user.userId}" />
@@ -52,20 +52,24 @@
 							<c:when
 								test="${rolesByPrivilege.key.required and rolesByPrivilege.key.missing}">
 								<c:set var="color" value="red" />
+								<c:set var="symbol" value="!" />
 							</c:when>
 							<c:when
 								test="${rolesByPrivilege.key.required and !rolesByPrivilege.key.missing }">
 								<c:set var="color" value="green" />
+								<c:set var="symbol" value="*" />
 							</c:when>
 							<c:when
 								test="${!rolesByPrivilege.key.required and rolesByPrivilege.key.missing}">
 								<c:set var="color" value="orange" />
+								<c:set var="symbol" value="?" />
 							</c:when>
 							<c:when
 								test="${!rolesByPrivilege.key.required and !rolesByPrivilege.key.missing}">
 								<c:set var="color" value="grey" />
+								<c:set var="symbol" value="+" />
 							</c:when>
-						</c:choose><span style="color: ${color}">${rolesByPrivilege.key.privilege}</span></td>
+						</c:choose><span style="color: ${color}">${symbol} ${rolesByPrivilege.key.privilege}</span></td>
 					<c:forEach items="${roles}" var="role" varStatus="status">
 						<td><c:choose>
 								<c:when test="${rolesByPrivilege.value[status.index]}">
