@@ -5,7 +5,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>privilegehelper</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>pom</packaging>
 	<name>Privilege Helper Module</name>
 	<description>Helps to discover and assign privileges to users</description>
@@ -92,29 +92,6 @@
 						<target>1.6</target>
 						<source>1.6</source>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.4</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>test-jar</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<executions>
-						<execution>
-							<goals>
-								<goal>test-jar</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
