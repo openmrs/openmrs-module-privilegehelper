@@ -163,7 +163,7 @@ public class PrivilegeLogEntry implements Serializable, Comparable<PrivilegeLogE
 			
 			@Override
 			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
-				if (o1.required && o2.required) {
+				if (o1.required == o2.required) {
 					return 0;
 				} else if (o1.required) {
 					return 1;
@@ -177,7 +177,7 @@ public class PrivilegeLogEntry implements Serializable, Comparable<PrivilegeLogE
 			
 			@Override
 			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
-				if (o1.missing && o2.missing) {
+				if (o1.missing == o2.missing) {
 					return 0;
 				} else if (o1.missing) {
 					return 1;
@@ -195,7 +195,9 @@ public class PrivilegeLogEntry implements Serializable, Comparable<PrivilegeLogE
 			}
 		});
 		
-		return chain.compare(o, this);
+		int result = chain.compare(o, this);
+		
+		return result;
 	}
 	
 }

@@ -166,13 +166,23 @@ public class PrivilegeAssignerController {
 			}
 			
 			if (privilege.isRequired()) {
-				//Remove not required privileges if there's a required one.
-				privileges.remove(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), false, !user
+				//Remove not required privilege if there's a required one.
+				rolesByPrivileges.remove(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), false, !user
 				        .hasPrivilege(privilege.getPrivilege())));
+				
+				rolesByPrivileges.put(
+				    new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(), !user
+				            .hasPrivilege(privilege.getPrivilege())), roles);
+			} else {
+				//Add not required privilege only if there's no required one.
+				if (!rolesByPrivileges.containsKey(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), true,
+				        !user.hasPrivilege(privilege.getPrivilege())))) {
+					rolesByPrivileges.put(
+					    new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(), !user
+					            .hasPrivilege(privilege.getPrivilege())), roles);
+				}
 			}
 			
-			rolesByPrivileges.put(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(),
-			        !user.hasPrivilege(privilege.getPrivilege())), roles);
 		}
 		
 		SortedSet<String> roles = new TreeSet<String>();
