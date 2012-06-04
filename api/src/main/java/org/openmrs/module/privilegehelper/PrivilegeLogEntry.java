@@ -193,7 +193,7 @@ public class PrivilegeLogEntry implements Serializable, Comparable<PrivilegeLogE
 			public int compare(PrivilegeLogEntry o1, PrivilegeLogEntry o2) {
 				return o1.getPrivilege().compareTo(o2.getPrivilege());
 			}
-		});
+		}, true);
 		
 		int result = chain.compare(o, this);
 		
