@@ -9,30 +9,6 @@
 <openmrs:htmlInclude
 	file="${pageContext.request.contextPath}/moduleResources/privilegehelper/scripts/selectItems.js" />
 
-<p>
-	<form:form modelAttribute="role">
-		<fieldset>
-			<legend>Assigning new role to ${user.personName}</legend>
-			<p></p>
-			<table>
-				<tr>
-					<td>Name:</td>
-					<td><form:input path="role" /> <form:errors path="role"
-							cssClass="error" /></td>
-				</tr>
-				<tr>
-					<td>Description:</td>
-					<td><form:input path="description" /> <form:errors
-							path="description" cssClass="error" /></td>
-				</tr>
-			</table>
-			<p>
-				<input type="submit" name="assignRole" value="Assign role" />
-			</p>
-		</fieldset>
-	</form:form>
-</p>
-<p>
 <form action="assignRoles.form" method="POST">
 	<p>Assigning privileges to roles for ${user.personName}</p>
 	<p>
@@ -47,23 +23,26 @@
 		<thead>
 			<tr>
 				<th></th>
-				<th colspan="${fn:length(roles)-1}" style="text-align: center">Current
+				<th colspan="${fn:length(roles)}" style="text-align: center">Current
 					Roles</th>
+				<th></th>
 			</tr>
 			<tr>
 				<th></th>
 				<c:forEach items="${roles}" var="role" varStatus="status">
-					<th>${role} <br />
-					<select name="selectItems" id="${role}">
+					<th style="text-align: center">${role} <br /> <select
+						name="selectItems" id="${role}">
 							<option>select</option>
 							<option>none</option>
-							<option>missing required</option>
+							<option>missing & required</option>
 							<option>all required</option>
-							<option>all missing</option>
 							<option>all</option>
 					</select>
 					</th>
 				</c:forEach>
+				<th><input type="button"
+					value="Create a new role and assign it to ${user.personName}"
+					onclick="window.location='assignRole.form?userId=${user.userId}'" /></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -116,6 +95,7 @@
 								</c:otherwise>
 							</c:choose></td>
 					</c:forEach>
+					<td></td>
 				</tr>
 			</c:forEach>
 		</tbody>
@@ -125,26 +105,7 @@
 			Some privileges do not exist:
 			<c:forEach items="${missingPrivileges}" var="privilege"
 				varStatus="status">
-				<c:choose>
-					<c:when
-						test="${rolesByPrivilege.key.required and rolesByPrivilege.key.missing}">
-						<c:set var="color" value="red" />
-					</c:when>
-					<c:when
-						test="${rolesByPrivilege.key.required and !rolesByPrivilege.key.missing }">
-						<c:set var="color" value="green" />
-					</c:when>
-					<c:when
-						test="${!rolesByPrivilege.key.required and rolesByPrivilege.key.missing}">
-						<c:set var="color" value="orange" />
-					</c:when>
-					<c:when
-						test="${!rolesByPrivilege.key.required and !rolesByPrivilege.key.missing}">
-						<c:set var="color" value="grey" />
-					</c:when>
-				</c:choose>
-				<span style="color: ${color}">${privilege.privilege}</span>
-				<c:if test="${!status.last}">, </c:if>
+				${privilege.privilege}<c:if test="${!status.last}">, </c:if>
 			</c:forEach>
 		</p>
 	</c:if>
@@ -152,6 +113,5 @@
 		<input type="submit" value="Save changes" />
 	</p>
 </form>
-</p>
 
 <%@ include file="/WEB-INF/template/footer.jsp"%>

@@ -16,14 +16,9 @@ $j(document).ready(function() {
 						var result = $j(el).hasClass("required");
 						$j(el).attr('checked', result);
 					});
-				} else if (option == "missing required") {
+				} else if (option == "missing & required") {
 					$j(input).each(function(i, el) {
 						var result = $j(el).hasClass("required") && $j(el).hasClass("missing");
-						$j(el).attr('checked', result);
-					});
-				} else if (option == "all missing") {
-					$j(input).each(function(i, el) {
-						var result = $j(el).hasClass("missing");
 						$j(el).attr('checked', result);
 					});
 				}

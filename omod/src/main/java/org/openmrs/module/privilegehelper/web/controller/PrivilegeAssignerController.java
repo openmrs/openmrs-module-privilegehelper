@@ -238,4 +238,32 @@ public class PrivilegeAssignerController {
 		
 		assignRoles(privileges, missingPrivileges, user, model);
 	}
+	
+	@RequestMapping(value = "/assignRole", method = RequestMethod.GET)
+	public void assignRole(final User user, final ModelMap model) {
+		model.addAttribute("userId", user.getUserId());
+	}
+	
+	@RequestMapping(value = "/assignRole", method = RequestMethod.POST)
+	public String assignRole(final User user, final Role newRole, final Errors errors, final ModelMap model) {
+		RoleValidator validator = new RoleValidator();
+		validator.validate(newRole, errors);
+		if (errors.hasErrors()) {
+			return null;
+		}
+		
+		Role role = Context.getUserService().getRole(newRole.getRole());
+		if (role != null) {
+			errors.rejectValue("role", "role.error.exists", "Role already exists");
+			return null;
+		}
+		
+		Context.getUserService().saveRole(newRole);
+		user.addRole(newRole);
+		Context.getUserService().saveUser(user, null);
+		
+		model.addAttribute("userId", user.getUserId());
+		return "redirect:assignRoles.form";
+	}
+	
 }
