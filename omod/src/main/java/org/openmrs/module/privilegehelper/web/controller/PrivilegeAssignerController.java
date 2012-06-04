@@ -165,6 +165,12 @@ public class PrivilegeAssignerController {
 				roles[i++] = !role.hasPrivilege(privilege.getPrivilege());
 			}
 			
+			if (privilege.isRequired()) {
+				//Remove not required privileges if there's a required one.
+				privileges.remove(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), false, !user
+				        .hasPrivilege(privilege.getPrivilege())));
+			}
+			
 			rolesByPrivileges.put(new PrivilegeLogEntry(user.getUserId(), privilege.getPrivilege(), privilege.isRequired(),
 			        !user.hasPrivilege(privilege.getPrivilege())), roles);
 		}
