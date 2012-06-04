@@ -100,6 +100,9 @@ public class PrivilegeAssignerController {
 			throw new IllegalArgumentException("User with id " + loggedUserId + " does not exist!");
 		}
 		
+		privileges.clear();
+		missingPrivileges.clear();
+		
 		final List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(loggedUser);
 		
 		for (PrivilegeLogEntry privilege : loggedPrivileges) {
