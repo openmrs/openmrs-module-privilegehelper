@@ -25,7 +25,7 @@
 		<p>
 			<input type="button" value="Assign privileges"
 				onclick="window.location='../assigner/assignUser.form?loggedUserId=${user.userId}'" />
-			or <input type="button" value="Remove logs"
+			or <input type="button" value="Discard this recording"
 				onclick="window.location='removeLogged.form?userId=${user.userId}'" />
 		</p>
 Privilege checks logged for ${user.personName}: 
@@ -33,9 +33,11 @@ Privilege checks logged for ${user.personName}:
 </c:choose>
 
 <p>
-	Legend: <span style="color: green">has required</span>, <span
-		style="color: red">missing required</span>, <span style="color: grey">has
-		not required</span>, <span style="color: orange">missing not required</span>
+	Legend: <span style="color: green">required to perform action -
+		already assigned</span>, <span style="color: red">required to perform
+		action - missing</span>, <span style="color: grey">enables optional
+		feature - already assigned</span>, <span style="color: orange">enables
+		optional feature - missing</span>
 </p>
 <p>
 	<c:forEach items="${loggedPrivileges}" var="privilege">

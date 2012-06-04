@@ -37,10 +37,10 @@
 	<fieldset>
 		<legend>Assigning privileges to roles for ${user.personName}</legend>
 		<p>
-			Legend: <span style="color: green">has required</span>, <span
-				style="color: red">missing required</span>, <span
-				style="color: grey">has not required</span>, <span
-				style="color: orange">missing not required</span>
+			Legend: <span style="color: green">required to perform action - already assigned</span>, <span
+				style="color: red">required to perform action - missing</span>, <span
+				style="color: grey">enables optional feature - already assigned</span>, <span
+				style="color: orange">enables optional feature - missing</span>
 		</p>
 		<input type="hidden" name="userId" value="${user.userId}" />
 		<table>
@@ -112,7 +112,7 @@
 											class="${class}" />
 									</c:when>
 									<c:otherwise>
-										<input type="checkbox" disabled checked />
+										<span style="font-size: xx-small;">already assigned</span>
 									</c:otherwise>
 								</c:choose></td>
 						</c:forEach>
