@@ -71,28 +71,34 @@
 							</c:when>
 						</c:choose><span style="color: ${color}">${symbol} ${rolesByPrivilege.key.privilege}</span></td>
 					<c:forEach items="${roles}" var="role" varStatus="status">
-						<td><c:choose>
+						<td>
+						<c:choose>
 								<c:when test="${rolesByPrivilege.value[status.index]}">
 									<c:choose>
 										<c:when
 											test="${rolesByPrivilege.key.required and rolesByPrivilege.key.missing}">
-											<c:set var="class" value="missing required" />
+											<input type="checkbox"
+												name="${rolesByPrivilege.key.privilege}" value="${role}"
+												class="missing required" />
 										</c:when>
 										<c:when
 											test="${rolesByPrivilege.key.required and !rolesByPrivilege.key.missing}">
-											<c:set var="class" value="required" />
+											<input type="checkbox"
+												name="${rolesByPrivilege.key.privilege}" value="${role}"
+												class="required" />
 										</c:when>
 										<c:when
 											test="${!rolesByPrivilege.key.required and rolesByPrivilege.key.missing }">
-											<c:set var="class" value="missing" />
+											<input type="checkbox"
+												name="${rolesByPrivilege.key.privilege}" value="${role}"
+												class="missing" />
 										</c:when>
 										<c:otherwise>
-											<c:set var="class" value="" />
+											<input type="checkbox"
+												name="${rolesByPrivilege.key.privilege}" value="${role}"
+												class="" />
 										</c:otherwise>
 									</c:choose>
-
-									<input type="checkbox" name="${rolesByPrivilege.key.privilege}"
-										value="${role}" class="${class}" />
 								</c:when>
 								<c:otherwise>
 									<span style="font-size: xx-small;">already assigned</span>
