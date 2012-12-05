@@ -27,6 +27,19 @@
 		<developerConnection>scm:git:https://github.com/openmrs/openmrs-module-privilegehelper</developerConnection>
 		<url>https://github.com/openmrs/openmrs-module-privilegehelper</url>
 	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>openmrs-repo-modules</id>
+			<name>Modules</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/modules</url>
+		</repository>
+		<snapshotRepository>
+			<id>openmrs-repo-snapshots</id>
+			<name>Modules</name>
+			<url>http://mavenrepo.openmrs.org/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 
 	<modules>
 		<module>api</module>
