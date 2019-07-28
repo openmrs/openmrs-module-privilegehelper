@@ -13,6 +13,7 @@
  */
 package org.openmrs.module.privilegehelper.web.controller;
 
+import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -26,11 +27,14 @@ import org.apache.commons.lang.StringUtils;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
 import org.openmrs.User;
+import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.privilegehelper.PrivilegeHelperWebConstants;
 import org.openmrs.module.privilegehelper.PrivilegeLogEntry;
 import org.openmrs.module.privilegehelper.PrivilegeLogger;
 import org.openmrs.validator.RoleValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -52,6 +56,8 @@ public class PrivilegeAssignerController {
 	public static final String PRIVILEGES = "privileges";
 	
 	public static final String MISSING_PRIVILEGES = "missingPrivileges";
+	
+	private static final Logger log = LoggerFactory.getLogger(PrivilegeAssignerController.class);
 	
 	@Autowired
 	PrivilegeLogger logger;
@@ -263,7 +269,19 @@ public class PrivilegeAssignerController {
 		
 		Context.getUserService().saveRole(newRole);
 		user.addRole(newRole);
-		Context.getUserService().saveUser(user, null);
+		try {
+			Context.getUserService().saveUser(user, null);
+		}
+		catch (Exception ex) {
+			try {
+				//This failure happens when running on platform 2.x which instead has saveUser(User)
+	            Method saveUser = UserService.class.getDeclaredMethod("saveUser", User.class);
+	            saveUser.invoke(Context.getUserService(), user);
+	        }
+			catch (Exception e) {
+				log.error("Failed to save user " + user, e);
+			}
+		}
 		
 		model.addAttribute("userId", user.getUserId());
 		return "redirect:assignRoles.form";
