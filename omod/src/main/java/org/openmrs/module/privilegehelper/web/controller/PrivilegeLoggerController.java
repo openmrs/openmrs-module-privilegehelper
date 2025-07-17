@@ -43,7 +43,7 @@ public class PrivilegeLoggerController {
 	@Autowired
 	PrivilegeLogger logger;
 	
-	@RequestMapping(value = "/log", method = RequestMethod.GET)
+	@RequestMapping(value = "/log.form", method = RequestMethod.GET)
 	public void log(ModelMap model) {
 		model.addAttribute("currentUser", Context.getAuthenticatedUser());
 		model.addAttribute("loggedUsers", logger.getLoggedUsers());

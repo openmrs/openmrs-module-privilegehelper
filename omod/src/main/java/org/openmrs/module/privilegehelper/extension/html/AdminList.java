@@ -43,8 +43,8 @@ public class AdminList extends AdministrationSectionExt {
 	 * @see AdministrationSectionExt#getLinks()
 	 */
 	public Map<String, String> getLinks() {
-		LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
-		map.put("/module/privilegehelper/logger/log.form", "privilegehelper.log");
+		LinkedHashMap<String, String> map = new LinkedHashMap<>();
+		map.put("module/privilegehelper/logger/log.form", "privilegehelper.log");
 		return map;
 	}
 	

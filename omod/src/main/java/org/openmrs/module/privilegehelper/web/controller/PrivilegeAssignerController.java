@@ -270,7 +270,7 @@ public class PrivilegeAssignerController {
 		Context.getUserService().saveRole(newRole);
 		user.addRole(newRole);
 		try {
-			Context.getUserService().saveUser(user, null);
+			Context.getUserService().saveUser(user);
 		}
 		catch (Exception ex) {
 			try {
