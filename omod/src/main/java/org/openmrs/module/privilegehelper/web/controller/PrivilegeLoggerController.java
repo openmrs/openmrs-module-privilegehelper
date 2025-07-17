@@ -59,7 +59,7 @@ public class PrivilegeLoggerController {
 		}
 	}
 	
-	@RequestMapping(value = "/log", method = RequestMethod.POST)
+	@RequestMapping(value = "/log.form", method = RequestMethod.POST)
 	public String logPrivileges(User user, Errors errors, ModelMap model) {
 		if (user.getUserId() == null) {
 			errors.rejectValue("userId", "privilegehelper.user.invalid", "You must enter a valid user");
@@ -72,7 +72,7 @@ public class PrivilegeLoggerController {
 		return "redirect:logged.form";
 	}
 	
-	@RequestMapping(value = "/stopLogging", method = RequestMethod.GET)
+	@RequestMapping(value = "/stopLogging.form", method = RequestMethod.GET)
 	public String stopLoggingPrivileges(User user, ModelMap model) {
 		List<PrivilegeLogEntry> loggedPrivileges = logger.stopLoggingPrivileges(user);
 		
@@ -80,14 +80,14 @@ public class PrivilegeLoggerController {
 		return PrivilegeHelperWebConstants.MODULE_URL + "/logger/logged";
 	}
 	
-	@RequestMapping(value = "/logged", method = RequestMethod.GET)
+	@RequestMapping(value = "/logged.form", method = RequestMethod.GET)
 	public void loggedPrivileges(User user, ModelMap model) {
 		List<PrivilegeLogEntry> loggedPrivileges = logger.getLoggedPrivileges(user);
 		
 		populateModelForLoggedPrivileges(user, loggedPrivileges, model);
 	}
 	
-	@RequestMapping(value = "/removeLogged", method = RequestMethod.GET)
+	@RequestMapping(value = "/removeLogged.form", method = RequestMethod.GET)
 	public String removeLoggedPrivileges(User user) {
 		logger.removeLoggedPrivileges(user);
 		

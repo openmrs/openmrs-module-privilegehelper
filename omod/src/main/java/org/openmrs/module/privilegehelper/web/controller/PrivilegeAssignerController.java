@@ -97,7 +97,7 @@ public class PrivilegeAssignerController {
 		}
 	}
 	
-	@RequestMapping(value = "/assignPrivileges")
+	@RequestMapping(value = "/assignPrivileges.form")
 	public String assignPrivileges(final @ModelAttribute(PRIVILEGES) SortedSet<PrivilegeLogEntry> privileges,
 	                               final @ModelAttribute(MISSING_PRIVILEGES) SortedSet<PrivilegeLogEntry> missingPrivileges,
 	                               final User user, @RequestParam final Integer loggedUserId, final ModelMap model) {
@@ -131,12 +131,12 @@ public class PrivilegeAssignerController {
 		return "redirect:assignRoles.form";
 	}
 	
-	@RequestMapping(value = "/assignUser", method = RequestMethod.GET)
+	@RequestMapping(value = "/assignUser.form", method = RequestMethod.GET)
 	public void assignUser(@RequestParam(required = false) final Integer loggedUserId, final ModelMap model) {
 		model.addAttribute("loggedUserId", loggedUserId);
 	}
 	
-	@RequestMapping(value = "/assignUser", method = RequestMethod.POST)
+	@RequestMapping(value = "/assignUser.form", method = RequestMethod.POST)
 	public String assignUser(@RequestParam(required = false) final Integer loggedUserId, final User user,
 	                         final Errors errors, final ModelMap model) {
 		if (user.getUserId() == null) {
@@ -151,7 +151,7 @@ public class PrivilegeAssignerController {
 		return "redirect:assignPrivileges.form";
 	}
 	
-	@RequestMapping(value = "/assignRoles", method = RequestMethod.GET)
+	@RequestMapping(value = "/assignRoles.form", method = RequestMethod.GET)
 	public void assignRoles(@ModelAttribute(PRIVILEGES) final SortedSet<PrivilegeLogEntry> privileges,
 	                        @ModelAttribute(MISSING_PRIVILEGES) final SortedSet<PrivilegeLogEntry> missingPrivileges,
 	                        final User user, final ModelMap model) {
@@ -204,7 +204,7 @@ public class PrivilegeAssignerController {
 		model.addAttribute("user", user);
 	}
 	
-	@RequestMapping(value = "/assignRoles", method = RequestMethod.POST)
+	@RequestMapping(value = "/assignRoles.form", method = RequestMethod.POST)
 	public void assignRolesPOST(@ModelAttribute(PRIVILEGES) final SortedSet<PrivilegeLogEntry> privileges,
 	                            @ModelAttribute(MISSING_PRIVILEGES) final SortedSet<PrivilegeLogEntry> missingPrivileges,
 	                            final User user, final HttpServletRequest request, final Role role, final Errors errors,
@@ -248,12 +248,12 @@ public class PrivilegeAssignerController {
 		assignRoles(privileges, missingPrivileges, user, model);
 	}
 	
-	@RequestMapping(value = "/assignRole", method = RequestMethod.GET)
+	@RequestMapping(value = "/assignRole.form", method = RequestMethod.GET)
 	public void assignRole(final User user, final ModelMap model) {
 		model.addAttribute("userId", user.getUserId());
 	}
 	
-	@RequestMapping(value = "/assignRole", method = RequestMethod.POST)
+	@RequestMapping(value = "/assignRole.form", method = RequestMethod.POST)
 	public String assignRole(final User user, final Role newRole, final Errors errors, final ModelMap model) {
 		RoleValidator validator = new RoleValidator();
 		validator.validate(newRole, errors);
