@@ -13,16 +13,23 @@
  */
 package org.openmrs.module.privilegehelper.web.controller;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import org.apache.commons.lang.StringUtils;
 import org.openmrs.Privilege;
 import org.openmrs.Role;
@@ -32,6 +39,7 @@ import org.openmrs.api.context.Context;
 import org.openmrs.module.privilegehelper.PrivilegeHelperWebConstants;
 import org.openmrs.module.privilegehelper.PrivilegeLogEntry;
 import org.openmrs.module.privilegehelper.PrivilegeLogger;
+import org.openmrs.module.privilegehelper.RoleExportEntry;
 import org.openmrs.validator.RoleValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -284,6 +293,29 @@ public class PrivilegeAssignerController {
 		}
 		
 		model.addAttribute("userId", user.getUserId());
+		return "redirect:assignRoles.form";
+	}
+
+	@GetMapping("/exportRoles.form")
+	public String export(@RequestParam("roles") List<String> roleNames,
+						 HttpServletResponse response) {
+
+		List<RoleExportEntry> roles = roleNames.stream().map(Context.getUserService()::getRole)
+				.filter(Objects::nonNull)
+				.map(RoleExportEntry::new)
+				.collect(Collectors.toList());
+
+		try {
+			response.setContentType("text/csv");
+			response.setHeader("Content-Disposition", "attachment; filename=roles_export.csv");
+
+			CsvMapper mapper = new CsvMapper();
+			CsvSchema schema = mapper.schemaFor(RoleExportEntry.class).withHeader();
+			ObjectWriter writer = mapper.writer(schema);
+			writer.writeValue(response.getOutputStream(), roles);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 		return "redirect:assignRoles.form";
 	}
 	
