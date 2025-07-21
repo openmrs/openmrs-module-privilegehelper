@@ -124,4 +124,19 @@
 	</p>
 </form>
 
+<form action="exportRoles.form" method="GET">
+	<p>
+		<label for="roles">Select role(s) to export:</label>
+		<br />
+		<select name="roles" id="roles" multiple size="6" required>
+			<c:forEach items="${roles}" var="role">
+				<option value="${role}">${role}</option>
+			</c:forEach>
+		</select>
+		<br/>
+		<input type="submit" value="Export Selected Roles" />
+	</p>
+</form>
+
+
 <%@ include file="/WEB-INF/template/footer.jsp"%>
